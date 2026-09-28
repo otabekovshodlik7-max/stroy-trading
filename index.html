@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="uz" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strong Trading - Xo'jalik va Qurilish Mollari Onlayn Do'koni</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        amber: {
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        },
+                        navy: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            scroll-behavior: smooth;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f59e0b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d97706;
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .light .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .product-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .product-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 25px -5px rgba(245, 158, 11, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 50%, #fef08a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .animate-pulse-subtle {
+            animation: pulse-subtle 3s infinite ease-in-out;
+        }
+
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.92; transform: scale(1.01); }
+        }
+
+        .badge-glow {
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+        }
+
+        .toast-enter {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Light mode specific override tweaks */
+        .light body {
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+    </style>
+</head>
+<body class="bg-navy-950 text-slate-100 min-h-screen flex flex-col transition-colors duration-300">
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="fixed top-20 right-5 z-50 flex flex-col gap-3 pointer-events-none max-w-sm w-full"></div>
+
+    <!-- TOP NAVBAR -->
+    <header class="sticky top-0 z-40 glass-panel border-b border-slate-800/80 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20 gap-4">
+                
+                <!-- Logo & Subtitle -->
+                <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('home')">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center text-navy-950 text-2xl font-black shadow-lg shadow-amber-500/20">
+                        <i class="fas fa-hammer"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-2xl font-extrabold tracking-tight gradient-text">STRONG</span>
+                            <span class="text-2xl font-bold text-slate-200 light:text-slate-800">TRADING</span>
+                        </div>
+                        <p class="text-xs text-amber-500/90 font-medium tracking-wide">Xo'jalik va Qurilish Mollari Do'koni</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Search Bar -->
+                <div class="hidden md:flex flex-1 max-w-md mx-4 relative">
+                    <input type="text" id="global-search" oninput="handleSearch(this.value)" placeholder="10,000+ xo'jalik va qurilish mollarini qidiring..." 
+                        class="w-full bg-navy-900/90 light:bg-slate-100 border border-slate-700/80 light:border-slate-300 rounded-xl px-4 py-2.5 pl-11 text-sm text-slate-100 light:text-slate-800 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all placeholder:text-slate-500">
+                    <i class="fas fa-search absolute left-4 top-3.5 text-slate-400"></i>
+                    <button onclick="clearSearch()" id="clear-search-btn" class="hidden absolute right-3 top-3 text-slate-400 hover:text-amber-500 text-xs bg-slate-800 px-1.5 py-0.5 rounded">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <!-- Desktop Nav Links -->
+                <nav class="hidden lg:flex items-center gap-1">
+                    <button onclick="switchTab('home')" id="nav-home" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition-all text-amber-500 bg-amber-500/10">
+                        <i class="fas fa-store mr-1.5"></i> Katalog
+                    </button>
+                    <button onclick="switchTab('sotish')" id="nav-sotish" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition-all text-slate-300 light:text-slate-700 hover:text-amber-500 hover:bg-slate-800/50">
+                        <i class="fas fa-hand-holding-dollar mr-1.5"></i> Sotish Bo'limi
+                    </button>
+                    <button onclick="switchTab('boglanish')" id="nav-boglanish" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition-all text-slate-300 light:text-slate-700 hover:text-amber-500 hover:bg-slate-800/50">
+                        <i class="fas fa-headset mr-1.5"></i> Bog'lanish
+                    </button>
+                    <button onclick="filterDeals()" class="px-3 py-2 rounded-lg text-sm font-semibold text-rose-400 hover:bg-rose-500/10 transition-all flex items-center gap-1">
+                        <i class="fas fa-fire text-rose-500 animate-bounce"></i> Chegirmalar
+                    </button>
+                </nav>
+
+                <!-- Action Controls -->
+                <div class="flex items-center gap-2">
+                    <!-- Dark/Light Theme Switcher -->
+                    <button onclick="toggleTheme()" class="p-2.5 rounded-xl border border-slate-700/60 light:border-slate-300 text-slate-300 light:text-slate-700 hover:text-amber-500 hover:border-amber-500 transition-all" title="Mavzuni o'zgartirish">
+                        <i id="theme-icon" class="fas fa-moon text-lg"></i>
+                    </button>
+
+                    <!-- Wishlist Button -->
+                    <button onclick="openWishlistDrawer()" class="relative p-2.5 rounded-xl border border-slate-700/60 light:border-slate-300 text-slate-300 light:text-slate-700 hover:text-amber-500 hover:border-amber-500 transition-all" title="Sevimlilar">
+                        <i class="fas fa-heart text-lg"></i>
+                        <span id="wishlist-badge" class="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-navy-950">0</span>
+                    </button>
+
+                    <!-- Cart Button -->
+                    <button onclick="openCartDrawer()" class="relative flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 text-navy-950 px-3.5 py-2.5 rounded-xl font-bold hover:shadow-lg hover:shadow-amber-500/25 transition-all">
+                        <div class="relative">
+                            <i class="fas fa-shopping-bag text-lg"></i>
+                            <span id="cart-badge" class="absolute -top-2 -right-2 bg-navy-950 text-amber-400 text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center border border-amber-400">0</span>
+                        </div>
+                        <span id="cart-total-header" class="hidden sm:inline font-black text-xs border-l border-navy-900/30 pl-2">0 so'm</span>
+                    </button>
+
+                    <!-- Mobile Menu Button -->
+                    <button onclick="toggleMobileMenu()" class="lg:hidden p-2.5 rounded-xl border border-slate-700 text-slate-300 hover:text-amber-500">
+                        <i class="fas fa-bars text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Search Bar (Visible only on small screens) -->
+            <div class="md:hidden pb-3">
+                <div class="relative">
+                    <input type="text" oninput="handleSearch(this.value)" placeholder="Qidiruv..." class="w-full bg-navy-900 border border-slate-700 rounded-lg px-4 py-2 pl-10 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
+                    <i class="fas fa-search absolute left-3 top-2.5 text-slate-400"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-menu" class="hidden lg:hidden fixed inset-0 z-50 bg-navy-950/95 backdrop-blur-lg p-6 flex flex-col justify-between">
+        <div>
+            <div class="flex items-center justify-between pb-6 border-b border-slate-800">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-hammer text-amber-500 text-xl"></i>
+                    <span class="font-bold text-lg gradient-text">STRONG TRADING</span>
+                </div>
+                <button onclick="toggleMobileMenu()" class="text-slate-400 text-xl hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="flex flex-col gap-4 py-6">
+                <button onclick="switchTab('home'); toggleMobileMenu();" class="text-left px-4 py-3 rounded-xl bg-slate-800/80 font-bold text-amber-500 flex items-center gap-3">
+                    <i class="fas fa-store"></i> Katalog
+                </button>
+                <button onclick="switchTab('sotish'); toggleMobileMenu();" class="text-left px-4 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 font-bold text-slate-200 flex items-center gap-3">
+                    <i class="fas fa-hand-holding-dollar text-amber-500"></i> Sotish Bo'limi
+                </button>
+                <button onclick="switchTab('boglanish'); toggleMobileMenu();" class="text-left px-4 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 font-bold text-slate-200 flex items-center gap-3">
+                    <i class="fas fa-headset text-amber-500"></i> Bog'lanish
+                </button>
+                <button onclick="filterDeals(); toggleMobileMenu();" class="text-left px-4 py-3 rounded-xl bg-rose-500/10 text-rose-400 font-bold flex items-center gap-3">
+                    <i class="fas fa-fire text-rose-500"></i> Chegirmali Mahsulotlar
+                </button>
+            </div>
+        </div>
+        <div class="p-4 rounded-xl bg-navy-900 border border-slate-800 text-xs text-slate-400 text-center">
+            <p class="font-semibold text-slate-200 mb-1">Strong Trading Do'koni</p>
+            <p>Toshkent sh., Chilonzor 10-mavze</p>
+            <p class="mt-2 text-amber-500 font-bold"><i class="fas fa-phone mr-1"></i> +998 (71) 200-55-44</p>
+        </div>
+    </div>
+
+    <!-- MAIN BODY CONTAINER -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+
+        <!-- TAB 1: HOME / KATALOG SECTION -->
+        <div id="tab-home" class="tab-content">
+
+            <!-- Hero Banner Carousel -->
+            <div class="relative rounded-2xl overflow-hidden glass-panel mb-8 border border-amber-500/20 shadow-2xl">
+                <div class="p-6 sm:p-10 md:p-12 bg-gradient-to-r from-navy-950 via-navy-900 to-amber-950/30 flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div class="max-w-xl space-y-4 text-center md:text-left">
+                        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                            <i class="fas fa-bolt text-amber-400"></i> Bahorgi Maxsus Chegirmalar
+                        </span>
+                        <h1 class="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white leading-tight">
+                            Uyingiz va Ishingiz Uchun <span class="gradient-text">Professional</span> Asboblar
+                        </h1>
+                        <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                            Elektr uskunalar, santexnika, bo'yoqlar va qurilish ashyolari. Kafolatlangan sifat va eng hamyonbop narxlar faqat Strong Trading'da!
+                        </p>
+                        <div class="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-2">
+                            <button onclick="scrollToProducts()" class="bg-gradient-to-r from-amber-500 to-amber-600 text-navy-950 px-6 py-3 rounded-xl font-extrabold text-sm hover:shadow-lg hover:shadow-amber-500/30 transition-all flex items-center gap-2">
+                                <i class="fas fa-basket-shopping"></i> Xaridlarni Boshlash
+                            </button>
+                            <button onclick="switchTab('sotish')" class="bg-slate-800/80 light:bg-slate-200 hover:bg-slate-700 text-slate-200 light:text-slate-800 px-6 py-3 rounded-xl font-bold text-sm border border-slate-700 transition-all">
+                                Mahsulot Sotish <i class="fas fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Hero Feature Visual -->
+                    <div class="relative w-full md:w-80 h-56 rounded-xl bg-gradient-to-tr from-amber-500/20 to-navy-800 border border-amber-500/30 flex items-center justify-center p-6 text-center group">
+                        <i class="fas fa-screwdriver-wrench text-7xl text-amber-500/80 group-hover:scale-110 transition-transform duration-500"></i>
+                        <div class="absolute inset-0 bg-gradient-to-t from-navy-950/80 via-transparent to-transparent flex items-end p-4">
+                            <div class="text-left">
+                                <p class="text-xs font-bold text-amber-400 uppercase tracking-widest">Kafolat</p>
+                                <p class="text-sm font-bold text-white">100% Asl Germaniya va Yaponiya Brendlari</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Value Proposition Badges -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="glass-panel p-4 rounded-xl flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl shrink-0"><i class="fas fa-truck-fast"></i></div>
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-200 light:text-slate-800">Tez Yetkazib Berish</h4>
+                        <p class="text-[11px] text-slate-400">Toshkent bo'yicha 2 soatda</p>
+                    </div>
+                </div>
+                <div class="glass-panel p-4 rounded-xl flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl shrink-0"><i class="fas fa-shield-halved"></i></div>
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-200 light:text-slate-800">1 Yillik Kafolat</h4>
+                        <p class="text-[11px] text-slate-400">Rasmiy xizmat ko'rsatish</p>
+                    </div>
+                </div>
+                <div class="glass-panel p-4 rounded-xl flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center text-xl shrink-0"><i class="fas fa-coins"></i></div>
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-200 light:text-slate-800">Eng Arzon Narx</h4>
+                        <p class="text-[11px] text-slate-400">To'g'ridan-to'g'ri zavoddan</p>
+                    </div>
+                </div>
+                <div class="glass-panel p-4 rounded-xl flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center text-xl shrink-0"><i class="fas fa-headset"></i></div>
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-200 light:text-slate-800">24/7 Qo'llab-quvvatlash</h4>
+                        <p class="text-[11px] text-slate-400">Mutaxassis maslahati</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Catalog Grid Layout with Sidebar Filters -->
+            <div id="catalog-section" class="flex flex-col lg:flex-row gap-8">
+
+                <!-- SIDEBAR FILTER PANEL -->
+                <aside class="w-full lg:w-72 shrink-0 space-y-6">
+                    <div class="glass-panel p-5 rounded-2xl border border-slate-800 space-y-6 sticky top-24">
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                            <h3 class="font-bold text-slate-200 light:text-slate-800 flex items-center gap-2">
+                                <i class="fas fa-filter text-amber-500"></i> Filtrlash
+                            </h3>
+                            <button onclick="resetFilters()" class="text-xs font-semibold text-amber-500 hover:underline">Tozalash</button>
+                        </div>
+
+                        <!-- Category Selector -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Kategoriyalar</label>
+                            <div class="space-y-1" id="category-filter-list">
+                                <!-- Populated dynamically by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Price Range Slider -->
+                        <div class="pt-2 border-t border-slate-800">
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Maksimal Narx</label>
+                                <span id="price-slider-value" class="text-xs font-extrabold text-amber-400">6,000,000 so'm</span>
+                            </div>
+                            <input type="range" id="price-range" min="50000" max="6000000" step="50000" value="6000000" oninput="updatePriceFilter(this.value)"
+                                class="w-full accent-amber-500 bg-slate-800 h-2 rounded-lg cursor-pointer">
+                        </div>
+
+                        <!-- Stock Status Checkbox -->
+                        <div class="pt-2 border-t border-slate-800 flex items-center justify-between">
+                            <label for="stock-only" class="text-xs font-semibold text-slate-300 light:text-slate-700 cursor-pointer">Faqat omborda borlar</label>
+                            <input type="checkbox" id="stock-only" onchange="applyFilters()" class="w-4 h-4 accent-amber-500 rounded cursor-pointer">
+                        </div>
+
+                        <!-- Sort By Option -->
+                        <div class="pt-2 border-t border-slate-800">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Saralash</label>
+                            <select id="sort-select" onchange="applyFilters()" class="w-full bg-navy-900 light:bg-slate-100 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 light:text-slate-800 focus:outline-none focus:border-amber-500">
+                                <option value="default">Ommabopligi bo'yicha</option>
+                                <option value="price-asc">Narx: arzonroqdan</option>
+                                <option value="price-desc">Narx: qimmatroqdan</option>
+                                <option value="rating">Yuqori reytingli</option>
+                            </select>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- PRODUCTS GRID CONTENT -->
+                <main class="flex-1 space-y-6">
+                    
+                    <!-- Top Toolbar & Active Filters Bar -->
+                    <div class="flex flex-wrap items-center justify-between gap-4 glass-panel p-4 rounded-xl">
+                        <div class="flex items-center gap-2 text-xs font-medium text-slate-400">
+                            <span>Topildi: <strong id="product-count" class="text-amber-400 font-extrabold">0</strong> ta mahsulot</span>
+                            <span id="active-filter-badge" class="hidden bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full text-[11px] border border-amber-500/30">
+                                Filter aktiv
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="setGridView('grid')" id="btn-view-grid" class="p-2 rounded-lg bg-amber-500 text-navy-950 font-bold text-xs"><i class="fas fa-th-large"></i></button>
+                            <button onclick="setGridView('list')" id="btn-view-list" class="p-2 rounded-lg bg-slate-800 text-slate-400 hover:text-white font-bold text-xs"><i class="fas fa-list"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Product Cards Grid Container -->
+                    <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Products inserted dynamically via JS -->
+                    </div>
+
+                    <!-- Empty Filter State -->
+                    <div id="empty-state" class="hidden text-center py-16 glass-panel rounded-2xl">
+                        <i class="fas fa-box-open text-6xl text-slate-600 mb-4"></i>
+                        <h3 class="text-lg font-bold text-slate-300">Siz qidirgan mahsulot topilmadi</h3>
+                        <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Filtrlarni o'zgartirib ko'ring yoki qidiruv so'zini to'g'rilang.</p>
+                        <button onclick="resetFilters()" class="mt-4 bg-amber-500 text-navy-950 font-bold px-4 py-2 rounded-xl text-xs hover:bg-amber-400">
+                            Barcha mahsulotlarni ko'rsatish
+                        </button>
+                    </div>
+
+                </main>
+            </div>
+        </div>
+
+        <!-- TAB 2: SOTISH BO'LIMI (SUPPLIER / USER SELLING PLATFORM) -->
+        <div id="tab-sotish" class="tab-content hidden space-y-8">
+            <div class="glass-panel p-6 sm:p-8 rounded-2xl border border-amber-500/30 relative overflow-hidden">
+                <div class="max-w-3xl">
+                    <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-400 mb-3">
+                        <i class="fas fa-store mr-1"></i> Hamkorlik va Sotish
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-white mb-2">O'z Xo'jalik Buyumlaringizni Strong Trading'ga Soting!</h2>
+                    <p class="text-slate-300 text-sm leading-relaxed">
+                        Sizda foydalanilmayotgan asbob-uskunalar, qurilish materiallari yoki ortiqcha santexnika jihozlari bormi? Ma'lumotlarni kiriting, biz do'konimiz orqali tezda sotishga yordam beramiz!
+                    </p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Sell Item Form -->
+                <div class="lg:col-span-7 glass-panel p-6 rounded-2xl space-y-4">
+                    <h3 class="font-bold text-lg text-slate-200 border-b border-slate-800 pb-3 flex items-center gap-2">
+                        <i class="fas fa-plus-circle text-amber-500"></i> E'lon Qoldirish Shaklini To'ldiring
+                    </h3>
+
+                    <form id="sell-form" onsubmit="handleSellSubmit(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Mahsulot Nomi *</label>
+                            <input type="text" id="sell-name" required placeholder="Masalan: Bosch Perforator 800W" oninput="updateSellPreview()"
+                                class="w-full bg-navy-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Kategoriya *</label>
+                                <select id="sell-category" required onchange="updateSellPreview()" class="w-full bg-navy-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
+                                    <option value="Asbob-uskunalar">Asbob-uskunalar</option>
+                                    <option value="Santexnika">Santexnika</option>
+                                    <option value="Elektr jihozlari">Elektr jihozlari</option>
+                                    <option value="Bo'yoq va Laklar">Bo'yoq va Laklar</option>
+                                    <option value="Bog'dorchilik">Bog'dorchilik</option>
+                                    <option value="Qurilish materiallari">Qurilish materiallari</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Sotuv Narxi (so'm) *</label>
+                                <input type="number" id="sell-price" required placeholder="550000" oninput="updateSellPreview()"
+                                    class="w-full bg-navy-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Holati *</label>
+                                <select id="sell-condition" required onchange="updateSellPreview()" class="w-full bg-navy-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
+                                    <option value="Yangi (Upakovka)">Yangi (Upakovka)</option>
+                                    <option value="A'lo holatda">A'lo holatda (Kam ishlatilgan)</option>
+                                    <option value="O'rtacha">O'rtacha ishlatilgan</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Telefon Raqamingiz *</label>
+                                <input type="tel" id="sell-phone" required placeholder="+998 (90) 123-45-67"
+                                    class="w-full bg-navy-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Rasm URL (ixtiyoriy)</label>
+                            <input type="url" id="sell-image" placeholder="https://images.unsplash.com/..." oninput="updateSellPreview()"
+                                class="w-full bg-navy-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Batafsil Izoh</label>
+                            <textarea id="sell-description" rows="3" placeholder="Mahsulot haqida qo'shimcha ma'lumotlar..."
+                                class="w-full bg-navy-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-500"></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-navy-950 font-black py-3 rounded-xl hover:shadow-lg hover:shadow-amber-500/25 transition-all text-sm">
+                            <i class="fas fa-paper-plane mr-2"></i> E'lonni Tasdiqlash va Joylash
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Live Preview Card & User Listings -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="glass-panel p-6 rounded-2xl space-y-4">
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fas fa-eye text-amber-500"></i> Jonli Ko'rinish (Preview)
+                        </h4>
+                        <!-- Dynamic Preview Card -->
+                        <div id="sell-preview-card" class="bg-navy-900 border border-amber-500/30 rounded-2xl p-4 space-y-3">
+                            <div class="h-40 rounded-xl bg-slate-800 flex items-center justify-center overflow-hidden relative">
+                                <img id="preview-img" src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover">
+                                <span id="preview-condition-badge" class="absolute top-2 right-2 bg-amber-500 text-navy-950 text-[10px] font-black px-2 py-0.5 rounded-full">Yangi</span>
+                            </div>
+                            <div>
+                                <span id="preview-category" class="text-[10px] font-bold text-amber-400 uppercase">ASBOB-USKUNALAR</span>
+                                <h4 id="preview-title" class="font-bold text-slate-100 text-base">Mahsulot Nomi Shu Yerda</h4>
+                                <p id="preview-price" class="text-lg font-black text-amber-400 mt-1">0 so'm</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Active Created Listings -->
+                    <div class="glass-panel p-6 rounded-2xl space-y-4">
+                        <h4 class="text-sm font-bold text-slate-200 flex items-center justify-between">
+                            <span>Siz Joylashtirgan E'lonlar</span>
+                            <span id="user-listings-count" class="text-xs font-bold bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full">0</span>
+                        </h4>
+                        <div id="user-listings-container" class="space-y-3 max-h-64 overflow-y-auto pr-1">
+                            <p class="text-xs text-slate-500 text-center py-4">Hozircha hech qanday e'lon joylamadingiz.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: BOG'LANISH BO'LIMI (CONTACT & SUPPORT) -->
+        <div id="tab-boglanish" class="tab-content hidden space-y-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Info Card 1 -->
+                <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-3 text-center">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-2xl mx-auto"><i class="fas fa-location-dot"></i></div>
+                    <h3 class="font-bold text-slate-200">Bosh Do'kon Manzili</h3>
+                    <p class="text-xs text-slate-400">Toshkent shahri, Chilonzor tumani, 10-mavze, Lutfiy ko'chasi, 24-uy</p>
+                </div>
+                <!-- Info Card 2 -->
+                <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-3 text-center">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-2xl mx-auto"><i class="fas fa-phone-volume"></i></div>
+                    <h3 class="font-bold text-slate-200">Aloqa Markazi</h3>
+                    <p class="text-xs text-slate-400">Ish vaqti: 08:00 - 21:00 (Dam olish kunlarisiz)</p>
+                    <p class="text-sm font-bold text-amber-400">+998 (71) 200-55-44</p>
+                </div>
+                <!-- Info Card 3 -->
+                <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-3 text-center">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-2xl mx-auto"><i class="fab fa-telegram"></i></div>
+                    <h3 class="font-bold text-slate-200">Telegram Bot</h3>
+                    <p class="text-xs text-slate-400">Avtomatik buyurtma va savollar uchun telegram manzilimiz</p>
+                    <a href="https://t.me" target="_blank" class="inline-block text-xs font-bold text-amber-400 hover:underline">@StrongTradingBot</a>
+                </div>
+            </div>
+
+            <!-- Contact Form & FAQ Accordion Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Contact Form -->
+                <div class="lg:col-span-6 glass-panel p-6 rounded-2xl space-y-4">
+                    <h3 class="font-bold text-lg text-slate-200 pb-3 border-b border-slate-800 flex items-center gap-2">
+                        <i class="fas fa-envelope text-amber-500"></i> Bizga Xabar Yuboring
+                    </h3>
+                    <form onsubmit="handleContactSubmit(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Ismingiz *</label>
+                            <input type="text" id="contact-name" required placeholder="Jasur Raximov" class="w-full bg-navy-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Telefon Raqam *</label>
+                            <input type="tel" id="contact-phone" required placeholder="+998 (90) 123-45-67" class="w-full bg-navy-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Xabar Yoki Savol *</label>
+                            <textarea id="contact-message" required rows="4" placeholder="Sizni qiziqtirgan savol va takliflaringiz..." class="w-full bg-navy-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-500"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-navy-950 font-black py-3 rounded-xl hover:shadow-lg hover:shadow-amber-500/25 transition-all text-sm">
+                            Xabarni Yuborish
+                        </button>
+                    </form>
+                </div>
+
+                <!-- FAQ Accordion -->
+                <div class="lg:col-span-6 glass-panel p-6 rounded-2xl space-y-4">
+                    <h3 class="font-bold text-lg text-slate-200 pb-3 border-b border-slate-800 flex items-center gap-2">
+                        <i class="fas fa-circle-question text-amber-500"></i> Ko'p Beriladigan Savollar (FAQ)
+                    </h3>
+                    <div class="space-y-3" id="faq-accordion">
+                        <div class="border border-slate-800 rounded-xl overflow-hidden">
+                            <button onclick="toggleFaq(1)" class="w-full p-4 text-left font-bold text-sm text-slate-200 flex justify-between items-center hover:bg-slate-800/50">
+                                <span>Yetkazib berish qancha vaqt oladi?</span>
+                                <i id="faq-icon-1" class="fas fa-chevron-down text-amber-500"></i>
+                            </button>
+                            <div id="faq-ans-1" class="hidden p-4 pt-0 text-xs text-slate-400 leading-relaxed border-t border-slate-800/50">
+                                Toshkent shahri ichida buyurtmalar 2-3 soat mobaynida yetkaziladi. Viloyatlarga esa Pochta orqali 1-2 kun ichida yetkazib beriladi.
+                            </div>
+                        </div>
+
+                        <div class="border border-slate-800 rounded-xl overflow-hidden">
+                            <button onclick="toggleFaq(2)" class="w-full p-4 text-left font-bold text-sm text-slate-200 flex justify-between items-center hover:bg-slate-800/50">
+                                <span>To'lov turlari qanday?</span>
+                                <i id="faq-icon-2" class="fas fa-chevron-down text-amber-500"></i>
+                            </button>
+                            <div id="faq-ans-2" class="hidden p-4 pt-0 text-xs text-slate-400 leading-relaxed border-t border-slate-800/50">
+                                Siz Click, Payme, Uzcard, Humo, Visa karta va yetkazib berilganda Naqd pul ko'rinishida to'lov qilishingiz mumkin.
+                            </div>
+                        </div>
+
+                        <div class="border border-slate-800 rounded-xl overflow-hidden">
+                            <button onclick="toggleFaq(3)" class="w-full p-4 text-left font-bold text-sm text-slate-200 flex justify-between items-center hover:bg-slate-800/50">
+                                <span>Mahsulotlarga kafolat bormi?</span>
+                                <i id="faq-icon-3" class="fas fa-chevron-down text-amber-500"></i>
+                            </button>
+                            <div id="faq-ans-3" class="hidden p-4 pt-0 text-xs text-slate-400 leading-relaxed border-t border-slate-800/50">
+                                Ha, barcha elektr asboblarimizga 1 yildan 3 yilgacha rasmiy kafolat beriladi. Kafolat taloni mahsulot bilan birga taqdim etiladi.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CART DRAWER / MODAL -->
+    <div id="cart-drawer" class="fixed inset-0 z-50 hidden">
+        <div onclick="closeCartDrawer()" class="absolute inset-0 bg-navy-950/80 backdrop-blur-sm"></div>
+        <div class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-navy-900 border-l border-slate-800 p-6 flex flex-col justify-between shadow-2xl">
+            <div>
+                <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                    <h3 class="font-black text-lg text-slate-100 flex items-center gap-2">
+                        <i class="fas fa-shopping-bag text-amber-500"></i> Xarid Savatchasi
+                    </h3>
+                    <button onclick="closeCartDrawer()" class="text-slate-400 hover:text-white"><i class="fas fa-times text-lg"></i></button>
+                </div>
+
+                <!-- Cart Items List -->
+                <div id="cart-items-container" class="py-4 space-y-4 max-h-[55vh] overflow-y-auto pr-1">
+                    <!-- Dynamic cart items JS -->
+                </div>
+            </div>
+
+            <!-- Cart Footer & Promo Code -->
+            <div class="pt-4 border-t border-slate-800 space-y-4">
+                <!-- Promo Code Box -->
+                <div class="flex gap-2">
+                    <input type="text" id="promo-input" placeholder="Promokod (masalan: STRONG10)" class="flex-1 bg-navy-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-500 uppercase">
+                    <button onclick="applyPromoCode()" class="bg-slate-800 hover:bg-slate-700 text-amber-400 px-3 py-2 rounded-xl text-xs font-bold border border-slate-700">Qo'llash</button>
+                </div>
+
+                <div class="space-y-1.5 text-xs text-slate-400">
+                    <div class="flex justify-between">
+                        <span>Mahsulotlar summasi:</span>
+                        <span id="cart-subtotal" class="font-bold text-slate-200">0 so'm</span>
+                    </div>
+                    <div class="flex justify-between text-emerald-400">
+                        <span>Chegirma:</span>
+                        <span id="cart-discount" class="font-bold">0 so'm</span>
+                    </div>
+                    <div class="flex justify-between text-sm font-black text-slate-100 pt-2 border-t border-slate-800">
+                        <span>Jami to'lov:</span>
+                        <span id="cart-grand-total" class="text-amber-400 text-base">0 so'm</span>
+                    </div>
+                </div>
+
+                <button onclick="openCheckoutModal()" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-navy-950 font-black py-3 rounded-xl hover:shadow-lg hover:shadow-amber-500/30 transition-all text-sm flex items-center justify-center gap-2">
+                    <i class="fas fa-credit-card"></i> Buyurtmani Rasmiylashtirish
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- WISHLIST DRAWER -->
+    <div id="wishlist-drawer" class="fixed inset-0 z-50 hidden">
+        <div onclick="closeWishlistDrawer()" class="absolute inset-0 bg-navy-950/80 backdrop-blur-sm"></div>
+        <div class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-navy-900 border-l border-slate-800 p-6 flex flex-col justify-between shadow-2xl">
+            <div>
+                <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                    <h3 class="font-black text-lg text-slate-100 flex items-center gap-2">
+                        <i class="fas fa-heart text-rose-500"></i> Sevimlilar Ro'yxati
+                    </h3>
+                    <button onclick="closeWishlistDrawer()" class="text-slate-400 hover:text-white"><i class="fas fa-times text-lg"></i></button>
+                </div>
+
+                <div id="wishlist-items-container" class="py-4 space-y-4 max-h-[70vh] overflow-y-auto pr-1">
+                    <!-- Dynamic Wishlist JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUICK VIEW MODAL -->
+    <div id="quickview-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <div onclick="closeQuickView()" class="absolute inset-0 bg-navy-950/80 backdrop-blur-sm"></div>
+        <div id="quickview-content" class="relative bg-navy-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 space-y-6 shadow-2xl overflow-hidden z-10">
+            <!-- Dynamic JS Quick View Content -->
+        </div>
+    </div>
+
+    <!-- CHECKOUT MODAL -->
+    <div id="checkout-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <div onclick="closeCheckoutModal()" class="absolute inset-0 bg-navy-950/85 backdrop-blur-sm"></div>
+        <div class="relative bg-navy-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl z-10 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <h3 class="font-extrabold text-lg text-slate-100 flex items-center gap-2">
+                    <i class="fas fa-truck-ramp-box text-amber-500"></i> Buyurtma Rasmiylashtirish
+                </h3>
+                <button onclick="closeCheckoutModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+
+            <form onsubmit="handleCheckoutSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">To'liq Ismingiz *</label>
+                    <input type="text" id="checkout-name" required placeholder="Sardor Umarov" class="w-full bg-navy-950 border border-slate-700 rounded-xl px-4 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Telefon Raqamingiz *</label>
+                    <input type="tel" id="checkout-phone" required placeholder="+998 (90) 123-45-67" class="w-full bg-navy-950 border border-slate-700 rounded-xl px-4 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Yetkazib Berish Manzili *</label>
+                    <input type="text" id="checkout-address" required placeholder="Toshkent sh., Yunusobod 4-mavze, 12-uy" class="w-full bg-navy-950 border border-slate-700 rounded-xl px-4 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">To'lov Usuli *</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <label class="border border-slate-700 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:border-amber-500">
+                            <input type="radio" name="payment-method" value="Click / Payme" checked class="accent-amber-500 mb-1">
+                            <span class="text-xs font-bold text-slate-200">Click / Payme</span>
+                        </label>
+                        <label class="border border-slate-700 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:border-amber-500">
+                            <input type="radio" name="payment-method" value="Uzcard / Humo" class="accent-amber-500 mb-1">
+                            <span class="text-xs font-bold text-slate-200">Uzcard / Humo</span>
+                        </label>
+                        <label class="border border-slate-700 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:border-amber-500">
+                            <input type="radio" name="payment-method" value="Naqd Pul" class="accent-amber-500 mb-1">
+                            <span class="text-xs font-bold text-slate-200">Naqd Pul</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded-xl bg-navy-950 border border-slate-800 space-y-1 text-xs">
+                    <div class="flex justify-between text-slate-400">
+                        <span>To'lanishi kerak:</span>
+                        <span id="checkout-final-price" class="text-amber-400 font-extrabold text-sm">0 so'm</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-navy-950 font-black py-3 rounded-xl hover:shadow-lg hover:shadow-emerald-500/25 transition-all text-sm">
+                    <i class="fas fa-check-circle mr-1"></i> Buyurtmani Tasdiqlash
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ORDER RECEIPT SUCCESS MODAL -->
+    <div id="receipt-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <div onclick="closeReceiptModal()" class="absolute inset-0 bg-navy-950/90 backdrop-blur-md"></div>
+        <div class="relative bg-navy-900 border border-amber-500/40 rounded-2xl max-w-md w-full p-6 text-center space-y-4 shadow-2xl z-10">
+            <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center text-3xl mx-auto border border-emerald-500/40">
+                <i class="fas fa-circle-check"></i>
+            </div>
+            <h3 class="text-2xl font-black text-white">Buyurtmangiz Qabul Qilindi!</h3>
+            <p class="text-xs text-slate-300">Rahmat! Bizning xodimlarimiz 15 daqiqa ichida siz bilan bog'lanishadi.</p>
+
+            <div id="receipt-details" class="text-left bg-navy-950 p-4 rounded-xl border border-slate-800 text-xs space-y-2">
+                <!-- Dynamic receipt content JS -->
+            </div>
+
+            <button onclick="closeReceiptModal()" class="w-full bg-amber-500 text-navy-950 font-black py-2.5 rounded-xl text-sm hover:bg-amber-400">
+                Tushunarli / Bosh Sahifaga
+            </button>
+        </div>
+    </div>
+
+    <!-- FLOATING LIVE CHAT WIDGET -->
+    <div class="fixed bottom-6 right-6 z-40">
+        <button onclick="toggleLiveChat()" class="w-14 h-14 rounded-full bg-gradient-to-tr from-amber-500 to-amber-600 text-navy-950 flex items-center justify-center text-2xl shadow-xl hover:scale-110 transition-all border-2 border-amber-300 animate-pulse-subtle">
+            <i class="fas fa-comments"></i>
+        </button>
+
+        <!-- Live Chat Box Window -->
+        <div id="chat-window" class="hidden absolute bottom-16 right-0 w-80 sm:w-96 bg-navy-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col h-96">
+            <div class="bg-gradient-to-r from-navy-800 to-navy-900 p-4 border-b border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 rounded-full bg-emerald-500 animate-ping"></div>
+                    <span class="font-bold text-sm text-slate-100">Strong Trading Chat Bot</span>
+                </div>
+                <button onclick="toggleLiveChat()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div id="chat-messages" class="flex-1 p-4 space-y-3 overflow-y-auto text-xs">
+                <div class="bg-slate-800/80 p-3 rounded-2xl rounded-tl-none max-w-[80%] text-slate-200">
+                    Assalomu alaykum! Strong Trading do'konimizga xush kelibsiz. Qanday yordam bera olaman?
+                </div>
+            </div>
+
+            <div class="p-3 border-t border-slate-800 flex gap-2">
+                <input type="text" id="chat-input" onkeypress="if(event.key==='Enter') sendChatMessage()" placeholder="Xabar yozing..." class="flex-1 bg-navy-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-500">
+                <button onclick="sendChatMessage()" class="bg-amber-500 text-navy-950 px-3 py-2 rounded-xl font-bold text-xs"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="mt-16 bg-navy-900 border-t border-slate-800 text-slate-400 text-xs py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="space-y-3">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-hammer text-amber-500 text-xl"></i>
+                    <span class="font-bold text-base gradient-text">STRONG TRADING</span>
+                </div>
+                <p class="text-slate-400 leading-relaxed">
+                    Xo'jalik, qurilish va maishiy texnika vositalarining O'zbekistondagi ishonchli do'koni.
+                </p>
+            </div>
+            <div>
+                <h4 class="font-bold text-slate-200 mb-3 uppercase tracking-wider">Bo'limlar</h4>
+                <ul class="space-y-2">
+                    <li><button onclick="switchTab('home')" class="hover:text-amber-500">Katalog</button></li>
+                    <li><button onclick="switchTab('sotish')" class="hover:text-amber-500">Mahsulot Sotish</button></li>
+                    <li><button onclick="switchTab('boglanish')" class="hover:text-amber-500">Bog'lanish va FAQ</button></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-slate-200 mb-3 uppercase tracking-wider">Kategoriyalar</h4>
+                <ul class="space-y-2">
+                    <li><a href="#" onclick="filterByCategory('Asbob-uskunalar')" class="hover:text-amber-500">Asbob-uskunalar</a></li>
+                    <li><a href="#" onclick="filterByCategory('Santexnika')" class="hover:text-amber-500">Santexnika</a></li>
+                    <li><a href="#" onclick="filterByCategory('Elektr jihozlari')" class="hover:text-amber-500">Elektr jihozlari</a></li>
+                </ul>
+            </div>
+            <div class="space-y-3">
+                <h4 class="font-bold text-slate-200 uppercase tracking-wider">Biz Bilan Bog'laning</h4>
+                <p><i class="fas fa-phone text-amber-500 mr-2"></i> +998 (71) 200-55-44</p>
+                <p><i class="fas fa-location-dot text-amber-500 mr-2"></i> Toshkent sh., Chilonzor 10</p>
+                <div class="flex gap-3 text-lg pt-2">
+                    <a href="#" class="text-slate-400 hover:text-amber-500"><i class="fab fa-telegram"></i></a>
+                    <a href="#" class="text-slate-400 hover:text-amber-500"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-slate-400 hover:text-amber-500"><i class="fab fa-facebook"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 mt-8 pt-6 border-t border-slate-800/60 text-center text-slate-500">
+            &copy; 2026 Strong Trading. Barcha huquqlar hamkorlikda himoyalangan.
+        </div>
+    </footer>
+
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Hardware & Household Goods Mock Database (12 Detailed Products)
+        const productsData = [
+            {
+                id: 1,
+                name: "DeWalt DCD791 Akkumulyatorli Shurupovyort",
+                category: "Asbob-uskunalar",
+                price: 1450000,
+                oldPrice: 1650000,
+                rating: 4.9,
+                reviews: 42,
+                badge: "Chegirma",
+                inStock: true,
+                image: "https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=600&q=80",
+                description: "Professional DeWalt 18V cho'tkasiz motorli akkumulyatorli shurupovyort. Yuqori kuch va uzoq muddatli xizmat ko'rsatish.",
+                specs: ["Kuchlanish: 18V", "Aylanish tezligi: 2000 ob/min", "Akkumulyator: 2.0Ah Li-Ion"]
+            },
+            {
+                id: 2,
+                name: "Makita GA5030 Boshqargich (Balgarka)",
+                category: "Asbob-uskunalar",
+                price: 890000,
+                oldPrice: null,
+                rating: 4.8,
+                reviews: 28,
+                badge: "Top",
+                inStock: true,
+                image: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80",
+                description: "Yengil va ixcham 720W quvvatga ega burchakli silliqlash mashinasi. Yapon sifati va chidamliligi.",
+                specs: ["Quvvat: 720 W", "Disk diametri: 125 mm", "Og'irligi: 1.8 kg"]
+            },
+            {
+                id: 3,
+                name: "Dulux Silk Flyud Ichki Bo'yoq 10L",
+                category: "Bo'yoq va Laklar",
+                price: 420000,
+                oldPrice: 480000,
+                rating: 4.7,
+                reviews: 19,
+                badge: "Chegirma",
+                inStock: true,
+                image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=600&q=80",
+                description: "Yuqori sifatli ipaksimon devor bo'yog'i. Yuvilishi oson va hid qilmaydi.",
+                specs: ["Hajmi: 10 Litr", "Rangi: Oq (Ipaksimon)", "Sarf: 12 kv.m/L"]
+            },
+            {
+                id: 4,
+                name: "GROHE Eurosmart Mikser Aralashtirgich",
+                category: "Santexnika",
+                price: 1150000,
+                oldPrice: null,
+                rating: 5.0,
+                reviews: 35,
+                badge: "Premium",
+                inStock: true,
+                image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80",
+                description: "Germaniyada ishlab chiqarilgan xromlangan vanna va rakovina mikseri.",
+                specs: ["Material: Guruch (Xrom)", "Kafolat: 5 Yil", "Karter: Keramika"]
+            },
+            {
+                id: 5,
+                name: "Kärcher K4 Power Control Yuqori Bosimli Yuvgich",
+                category: "Bog'dorchilik",
+                price: 3200000,
+                oldPrice: 3500000,
+                rating: 4.9,
+                reviews: 50,
+                badge: "Top",
+                inStock: true,
+                image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=600&q=80",
+                description: "Mashina va hovlini yuvish uchun mos bo'lgan yuqori bosimli nemis moyka apparati.",
+                specs: ["Bosim: 130 bar", "Suv sarfi: 420 L/soat", "Shlang uzunligi: 6m"]
+            },
+            {
+                id: 6,
+                name: "Philips LED Proyektor Yoritgich 100W IP65",
+                category: "Elektr jihozlari",
+                price: 380000,
+                oldPrice: null,
+                rating: 4.6,
+                reviews: 14,
+                badge: "Yangi",
+                inStock: true,
+                image: "https://images.unsplash.com/photo-1565814636199-ae8133055c1c?auto=format&fit=crop&w=600&q=80",
+                description: "Tashqi hovli va ob'ektlarni yoritish uchun suvga chidamli kuchli svetodiod projektor.",
+                specs: ["Quvvat: 100W", "Yorug'lik: 10000 Lm", "Himoya: IP65"]
+            },
+            {
+                id: 7,
+                name: "Alumet Transformer Narvon 4x4",
+                category: "Qurilish materiallari",
+                price: 1350000,
+                oldPrice: 1500000,
+                rating: 4.8,
+                reviews: 22,
+                badge: "Chegirma",
+                inStock: true,
+                image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80",
+                description: "Kompakt transformator narvon. 4.7 metrgacha yoziladi, alyuminiy korpus.",
+                specs: ["Balandligi: 4.7m", "Maksimal yuk: 150kg", "Zinalar: 4x4"]
+            },
+            {
+                id: 8,
+                name: "Total Tools 142 Bo'lakli Asboblar To'plami",
+                category: "Asbob-uskunalar",
+                price: 2100000,
+                oldPrice: null,
+                rating: 4.9,
+                reviews: 67,
+                badge: "Top",
+                inStock: true,
+                image: "https://images.unsplash.com/photo-1530124566582-a618bc2615dc?auto=format&fit=crop&w=600&q=80",
+                description: "Avtoservis va uy ustalari uchun barcha turdagi kalit va golovkalar to'plami chemodanda.",
+                specs: ["Qismlar: 142 ta", "Material: CVR Po'lat", "Chemodan: Zarbalarga chidamli"]
+            },
+            {
+                id: 9,
+                name: "Bosch Indego Maysa O'rgich Mower",
+                category: "Bog'dorchilik",
+                price: 5400000,
+                oldPrice: 5800000,
+                rating: 4.5,
+                reviews: 9,
+                badge: "Komyuter",
+                inStock: false,
+                image: "https://images.unsplash.com/photo-1592417817098-8f3d6eb1b7a5?auto=format&fit=crop&w=600&q=80",
+                description: "Avtomatik maysa o'rish mashinasi hovli va maysazorlarni ozoda tutish uchun.",
+                specs: ["Maydon: 300 kv.m", "Akumulyator: Li-Ion", "Balandlik: 30-50mm"]
+            },
+            {
+                id: 10,
+                name: "Stayer 1000V Dielektrik Otvyortkalar Seti",
+                category: "Elektr jihozlari",
+                price: 240000,
+                oldPrice: null,
+                rating: 4.7,
+                reviews: 31,
+                badge: "Yangi",
+                inStock: true,
+                image: "https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=600&q=80",
+                description: "Elektriklar uchun 1000 Voltgacha xavfsiz izolyatsiyalangan otvyortkalar.",
+                specs: ["Soni: 6 ta", "Himoya: 1000V", "Sertifikat: VDE"]
+            },
+            {
+                id: 11,
+                name: "Hilti TE 30-AVR Perforator",
+                category: "Asbob-uskunalar",
+                price: 4800000,
+                oldPrice: 5200000,
+                rating: 5.0,
+                reviews: 83,
+                badge: "Chegirma",
+                inStock: true,
+                image: "https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=600&q=80",
+                description: "Professional og'ir qurilish va beton teshish uchun Shveytsariya perforatori.",
+                specs: ["Zarba kuchi: 3.6 Joule", "Quvvat: 850W", "Tizim: SDS-Plus"]
+            },
+            {
+                id: 12,
+                name: "Knauf Rotband Suvoq Aralashmasi 30kg",
+                category: "Qurilish materiallari",
+                price: 85000,
+                oldPrice: null,
+                rating: 4.8,
+                reviews: 110,
+                badge: "Ommabop",
+                inStock: true,
+                image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=600&q=80",
+                description: "Gipsli sifatli devor suvog'i va shpaklevka asosi.",
+                specs: ["Vazni: 30 kg", "Sarf: 8.5 kg/m2", "Qurish vaqti: 7 kun"]
+            }
+        ];
+
+        // Global State Management
+        let cart = JSON.parse(localStorage.getItem('st_cart')) || [];
+        let wishlist = JSON.parse(localStorage.getItem('st_wishlist')) || [];
+        let userListings = JSON.parse(localStorage.getItem('st_user_listings')) || [];
+        let selectedCategory = 'All';
+        let searchQuery = '';
+        let maxPrice = 6000000;
+        let stockOnly = false;
+        let sortBy = 'default';
+        let appliedPromo = null;
+        let currentTheme = localStorage.getItem('st_theme') || 'dark';
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            renderCategoriesFilter();
+            applyFilters();
+            updateCartBadges();
+            updateWishlistBadges();
+            renderUserListings();
+        });
+
+        function initTheme() {
+            if (currentTheme === 'light') {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light');
+                document.getElementById('theme-icon').className = 'fas fa-sun text-amber-500';
+            } else {
+                document.documentElement.classList.remove('light');
+                document.documentElement.classList.add('dark');
+                document.getElementById('theme-icon').className = 'fas fa-moon text-lg';
+            }
+        }
+
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light');
+                currentTheme = 'light';
+                document.getElementById('theme-icon').className = 'fas fa-sun text-amber-500';
+            } else {
+                document.documentElement.classList.remove('light');
+                document.documentElement.classList.add('dark');
+                currentTheme = 'dark';
+                document.getElementById('theme-icon').className = 'fas fa-moon text-lg';
+            }
+            localStorage.setItem('st_theme', currentTheme);
+            showToast("Mavzu o'zgartirildi!");
+        }
+
+        // Tab Switcher Logic
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = "nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition-all text-slate-300 light:text-slate-700 hover:text-amber-500 hover:bg-slate-800/50";
+            });
+
+            const activeBtn = document.getElementById(`nav-${tabName}`);
+            if (activeBtn) {
+                activeBtn.className = "nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition-all text-amber-500 bg-amber-500/10";
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Categories & Filter Engine
+        function renderCategoriesFilter() {
+            const categories = ['All', 'Asbob-uskunalar', 'Santexnika', 'Elektr jihozlari', "Bo'yoq va Laklar", 'Bog\'dorchilik', 'Qurilish materiallari'];
+            const container = document.getElementById('category-filter-list');
+            
+            container.innerHTML = categories.map(cat => `
+                <button onclick="filterByCategory('${cat}')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold flex items-center justify-between transition-all ${selectedCategory === cat ? 'bg-amber-500 text-navy-950 font-bold' : 'text-slate-300 hover:bg-slate-800/60'}">
+                    <span>${cat === 'All' ? 'Barcha Kategoriyalar' : cat}</span>
+                    <i class="fas fa-chevron-right text-[10px] opacity-60"></i>
+                </button>
+            `).join('');
+        }
+
+        function filterByCategory(cat) {
+            selectedCategory = cat;
+            renderCategoriesFilter();
+            applyFilters();
+            switchTab('home');
+        }
+
+        function filterDeals() {
+            switchTab('home');
+            selectedCategory = 'All';
+            renderCategoriesFilter();
+            const filtered = productsData.filter(p => p.oldPrice !== null);
+            renderProducts(filtered);
+            showToast("Faqat chegirmali mahsulotlar saralandi");
+        }
+
+        function handleSearch(val) {
+            searchQuery = val.toLowerCase().trim();
+            document.getElementById('clear-search-btn').classList.toggle('hidden', searchQuery === '');
+            applyFilters();
+        }
+
+        function clearSearch() {
+            document.getElementById('global-search').value = '';
+            handleSearch('');
+        }
+
+        function updatePriceFilter(val) {
+            maxPrice = parseInt(val);
+            document.getElementById('price-slider-value').innerText = formatPrice(maxPrice);
+            applyFilters();
+        }
+
+        function applyFilters() {
+            stockOnly = document.getElementById('stock-only').checked;
+            sortBy = document.getElementById('sort-select').value;
+
+            let filtered = productsData.filter(p => {
+                const matchCategory = selectedCategory === 'All' || p.category === selectedCategory;
+                const matchSearch = p.name.toLowerCase().includes(searchQuery) || p.description.toLowerCase().includes(searchQuery);
+                const matchPrice = p.price <= maxPrice;
+                const matchStock = !stockOnly || p.inStock;
+                return matchCategory && matchSearch && matchPrice && matchStock;
+            });
+
+            // Sorting logic
+            if (sortBy === 'price-asc') filtered.sort((a, b) => a.price - b.price);
+            if (sortBy === 'price-desc') filtered.sort((a, b) => b.price - a.price);
+            if (sortBy === 'rating') filtered.sort((a, b) => b.rating - a.rating);
+
+            document.getElementById('product-count').innerText = filtered.length;
+            document.getElementById('active-filter-badge').classList.toggle('hidden', selectedCategory === 'All' && searchQuery === '' && maxPrice === 6000000 && !stockOnly);
+
+            renderProducts(filtered);
+        }
+
+        function resetFilters() {
+            selectedCategory = 'All';
+            searchQuery = '';
+            maxPrice = 6000000;
+            stockOnly = false;
+            sortBy = 'default';
+            
+            document.getElementById('global-search').value = '';
+            document.getElementById('price-range').value = 6000000;
+            document.getElementById('price-slider-value').innerText = formatPrice(6000000);
+            document.getElementById('stock-only').checked = false;
+            document.getElementById('sort-select').value = 'default';
+
+            renderCategoriesFilter();
+            applyFilters();
+            showToast("Filtrlar tozalandi");
+        }
+
+        // Product Rendering
+        function renderProducts(items) {
+            const grid = document.getElementById('products-grid');
+            const emptyState = document.getElementById('empty-state');
+
+            if (items.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            grid.innerHTML = items.map(p => {
+                const isWished = wishlist.some(item => item.id === p.id);
+                return `
+                <div class="product-card glass-panel rounded-2xl overflow-hidden border border-slate-800 flex flex-col justify-between group">
+                    <div class="relative">
+                        <!-- Image Container -->
+                        <div class="h-48 bg-slate-900 overflow-hidden relative">
+                            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <!-- Badge -->
+                            <span class="absolute top-3 left-3 bg-gradient-to-r from-amber-500 to-amber-600 text-navy-950 font-black text-[10px] px-2.5 py-1 rounded-full shadow-md">
+                                ${p.badge}
+                            </span>
+                            <!-- Favorite Button -->
+                            <button onclick="toggleWishlist(${p.id})" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-navy-950/70 backdrop-blur-md flex items-center justify-center text-slate-300 hover:text-rose-500 transition-all">
+                                <i class="${isWished ? 'fas fa-heart text-rose-500' : 'far fa-heart'}"></i>
+                            </button>
+                            <!-- Quick View Overlay -->
+                            <button onclick="openQuickView(${p.id})" class="absolute inset-0 bg-navy-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold gap-2">
+                                <i class="fas fa-eye"></i> Tezkor Ko'rish
+                            </button>
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="p-4 space-y-2">
+                            <div class="flex items-center justify-between text-[11px] text-slate-400">
+                                <span>${p.category}</span>
+                                <div class="flex items-center gap-1 text-amber-400 font-bold">
+                                    <i class="fas fa-star text-[10px]"></i>
+                                    <span>${p.rating}</span>
+                                    <span class="text-slate-500">(${p.reviews})</span>
+                                </div>
+                            </div>
+                            <h3 class="font-bold text-sm text-slate-100 light:text-slate-800 line-clamp-2 hover:text-amber-500 cursor-pointer" onclick="openQuickView(${p.id})">
+                                ${p.name}
+                            </h3>
+                            <p class="text-xs text-slate-400 line-clamp-2">${p.description}</p>
+                        </div>
+                    </div>
+
+                    <!-- Card Footer & Price -->
+                    <div class="p-4 pt-0 space-y-3">
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-base font-black text-amber-400">${formatPrice(p.price)}</span>
+                            ${p.oldPrice ? `<span class="text-xs text-slate-500 line-through">${formatPrice(p.oldPrice)}</span>` : ''}
+                        </div>
+                        <button onclick="addToCart(${p.id})" class="w-full bg-slate-800/90 light:bg-slate-200 hover:bg-amber-500 hover:text-navy-950 text-slate-200 light:text-slate-800 font-bold py-2.5 rounded-xl transition-all text-xs flex items-center justify-center gap-2">
+                            <i class="fas fa-cart-plus"></i> Savatga Qo'shish
+                        </button>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        // Cart Management Logic
+        function addToCart(productId) {
+            const product = productsData.find(p => p.id === productId);
+            if (!product) return;
+
+            const existingIndex = cart.findIndex(item => item.id === productId);
+            if (existingIndex > -1) {
+                cart[existingIndex].qty += 1;
+            } else {
+                cart.push({ ...product, qty: 1 });
+            }
+
+            saveCart();
+            showToast(`${product.name} savatga qo'shildi!`);
+        }
+
+        function updateCartQty(productId, delta) {
+            const item = cart.find(i => i.id === productId);
+            if (item) {
+                item.qty += delta;
+                if (item.qty <= 0) {
+                    cart = cart.filter(i => i.id !== productId);
+                }
+                saveCart();
+            }
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(i => i.id !== productId);
+            saveCart();
+            showToast("Mahsulot savatdan olib tashlandi");
+        }
+
+        function saveCart() {
+            localStorage.setItem('st_cart', JSON.stringify(cart));
+            updateCartBadges();
+            renderCartDrawer();
+        }
+
+        function updateCartBadges() {
+            const totalQty = cart.reduce((acc, i) => acc + i.qty, 0);
+            const totalPrice = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+            document.getElementById('cart-badge').innerText = totalQty;
+            document.getElementById('cart-total-header').innerText = formatPrice(totalPrice);
+        }
+
+        function renderCartDrawer() {
+            const container = document.getElementById('cart-items-container');
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-slate-500 space-y-3">
+                        <i class="fas fa-basket-shopping text-5xl"></i>
+                        <p class="text-xs">Savat hali bo'sh</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = cart.map(item => `
+                    <div class="flex items-center gap-3 bg-navy-950 p-3 rounded-xl border border-slate-800">
+                        <img src="${item.image}" class="w-14 h-14 object-cover rounded-lg">
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-xs font-bold text-slate-200 truncate">${item.name}</h4>
+                            <p class="text-xs font-black text-amber-400 mt-0.5">${formatPrice(item.price)}</p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <button onclick="updateCartQty(${item.id}, -1)" class="w-5 h-5 rounded bg-slate-800 text-slate-300 flex items-center justify-center font-bold text-xs">-</button>
+                                <span class="text-xs font-bold text-slate-100">${item.qty}</span>
+                                <button onclick="updateCartQty(${item.id}, 1)" class="w-5 h-5 rounded bg-slate-800 text-slate-300 flex items-center justify-center font-bold text-xs">+</button>
+                            </div>
+                        </div>
+                        <button onclick="removeFromCart(${item.id})" class="text-slate-500 hover:text-rose-500 text-xs p-1">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `).join('');
+            }
+
+            const subtotal = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+            const discount = appliedPromo ? Math.round(subtotal * appliedPromo.percent) : 0;
+            const grandTotal = subtotal - discount;
+
+            document.getElementById('cart-subtotal').innerText = formatPrice(subtotal);
+            document.getElementById('cart-discount').innerText = `- ${formatPrice(discount)}`;
+            document.getElementById('cart-grand-total').innerText = formatPrice(grandTotal);
+            document.getElementById('checkout-final-price').innerText = formatPrice(grandTotal);
+        }
+
+        function applyPromoCode() {
+            const input = document.getElementById('promo-input').value.trim().toUpperCase();
+            if (input === 'STRONG10') {
+                appliedPromo = { code: 'STRONG10', percent: 0.10 };
+                showToast("10% promokod qo'llanildi!");
+            } else if (input === 'XOZMAQ20') {
+                appliedPromo = { code: 'XOZMAQ20', percent: 0.20 };
+                showToast("20% promokod qo'llanildi!");
+            } else {
+                showToast("Noto'g'ri promokod kiritildi");
+            }
+            renderCartDrawer();
+        }
+
+        // Wishlist Management
+        function toggleWishlist(productId) {
+            const product = productsData.find(p => p.id === productId);
+            if (!product) return;
+
+            const index = wishlist.findIndex(item => item.id === productId);
+            if (index > -1) {
+                wishlist.splice(index, 1);
+                showToast("Sevimlilardan olib tashlandi");
+            } else {
+                wishlist.push(product);
+                showToast("Sevimlilarga qo'shildi!");
+            }
+
+            localStorage.setItem('st_wishlist', JSON.stringify(wishlist));
+            updateWishlistBadges();
+            applyFilters();
+            renderWishlistDrawer();
+        }
+
+        function updateWishlistBadges() {
+            document.getElementById('wishlist-badge').innerText = wishlist.length;
+        }
+
+        function renderWishlistDrawer() {
+            const container = document.getElementById('wishlist-items-container');
+            if (wishlist.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-slate-500 space-y-3">
+                        <i class="fas fa-heart text-5xl"></i>
+                        <p class="text-xs">Sevimlilar ro'yxati bo'sh</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = wishlist.map(item => `
+                    <div class="flex items-center gap-3 bg-navy-950 p-3 rounded-xl border border-slate-800">
+                        <img src="${item.image}" class="w-14 h-14 object-cover rounded-lg">
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-xs font-bold text-slate-200 truncate">${item.name}</h4>
+                            <p class="text-xs font-black text-amber-400 mt-1">${formatPrice(item.price)}</p>
+                        </div>
+                        <button onclick="addToCart(${item.id}); toggleWishlist(${item.id});" class="bg-amber-500 text-navy-950 px-2.5 py-1.5 rounded-lg font-bold text-[11px]">
+                            + Savat
+                        </button>
+                        <button onclick="toggleWishlist(${item.id})" class="text-slate-500 hover:text-rose-500 text-xs p-1">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Quick View Modal Logic
+        function openQuickView(productId) {
+            const p = productsData.find(item => item.id === productId);
+            if (!p) return;
+
+            const container = document.getElementById('quickview-content');
+            container.innerHTML = `
+                <button onclick="closeQuickView()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fas fa-times text-lg"></i></button>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div class="h-64 rounded-xl bg-slate-900 overflow-hidden">
+                        <img src="${p.image}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="space-y-3">
+                        <span class="text-xs font-bold text-amber-400 uppercase">${p.category}</span>
+                        <h3 class="text-lg font-extrabold text-slate-100">${p.name}</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">${p.description}</p>
+                        <div class="space-y-1 text-xs text-slate-400 border-t border-slate-800 pt-2">
+                            ${p.specs.map(s => `<p><i class="fas fa-check text-amber-500 mr-2"></i>${s}</p>`).join('')}
+                        </div>
+                        <div class="text-xl font-black text-amber-400 pt-2">${formatPrice(p.price)}</div>
+                        <button onclick="addToCart(${p.id}); closeQuickView();" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-navy-950 font-black py-3 rounded-xl text-xs">
+                            <i class="fas fa-cart-plus mr-1"></i> Savatga Qo'shish
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('quickview-modal').classList.remove('hidden');
+        }
+
+        function closeQuickView() {
+            document.getElementById('quickview-modal').classList.add('hidden');
+        }
+
+        // Supplier Selling Platform Logic
+        function updateSellPreview() {
+            const name = document.getElementById('sell-name').value || "Mahsulot Nomi Shu Yerda";
+            const category = document.getElementById('sell-category').value;
+            const price = document.getElementById('sell-price').value || "0";
+            const condition = document.getElementById('sell-condition').value;
+            const img = document.getElementById('sell-image').value || "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=500&q=80";
+
+            document.getElementById('preview-title').innerText = name;
+            document.getElementById('preview-category').innerText = category.toUpperCase();
+            document.getElementById('preview-price').innerText = formatPrice(parseInt(price) || 0);
+            document.getElementById('preview-condition-badge').innerText = condition;
+            document.getElementById('preview-img').src = img;
+        }
+
+        function handleSellSubmit(e) {
+            e.preventDefault();
+            const newItem = {
+                id: Date.now(),
+                name: document.getElementById('sell-name').value,
+                category: document.getElementById('sell-category').value,
+                price: parseInt(document.getElementById('sell-price').value),
+                condition: document.getElementById('sell-condition').value,
+                phone: document.getElementById('sell-phone').value,
+                description: document.getElementById('sell-description').value,
+                date: new Date().toLocaleDateString('uz-UZ')
+            };
+
+            userListings.unshift(newItem);
+            localStorage.setItem('st_user_listings', JSON.stringify(userListings));
+            renderUserListings();
+            document.getElementById('sell-form').reset();
+            updateSellPreview();
+            showToast("E'loningiz muvaffaqiyatli joylashtirildi!");
+        }
+
+        function renderUserListings() {
+            const container = document.getElementById('user-listings-container');
+            document.getElementById('user-listings-count').innerText = userListings.length;
+
+            if (userListings.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">Hozircha hech qanday e'lon joylamadingiz.</p>`;
+            } else {
+                container.innerHTML = userListings.map(item => `
+                    <div class="p-3 bg-navy-950 border border-slate-800 rounded-xl space-y-1">
+                        <div class="flex justify-between items-start">
+                            <h5 class="text-xs font-bold text-slate-200">${item.name}</h5>
+                            <span class="text-[10px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded">${item.condition}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-[11px]">
+                            <span class="font-extrabold text-amber-400">${formatPrice(item.price)}</span>
+                            <span class="text-slate-500">${item.date}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Checkout & Receipt Modal Handlers
+        function openCheckoutModal() {
+            if (cart.length === 0) {
+                showToast("Savatda hech qanday mahsulot yo'q");
+                return;
+            }
+            closeCartDrawer();
+            document.getElementById('checkout-modal').classList.remove('hidden');
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkout-modal').classList.add('hidden');
+        }
+
+        function handleCheckoutSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('checkout-name').value;
+            const phone = document.getElementById('checkout-phone').value;
+            const address = document.getElementById('checkout-address').value;
+            const payment = document.querySelector('input[name="payment-method"]:checked').value;
+
+            const subtotal = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+            const discount = appliedPromo ? Math.round(subtotal * appliedPromo.percent) : 0;
+            const grandTotal = subtotal - discount;
+
+            const receiptDetails = document.getElementById('receipt-details');
+            receiptDetails.innerHTML = `
+                <p><strong>Mijoz:</strong> ${name}</p>
+                <p><strong>Telefon:</strong> ${phone}</p>
+                <p><strong>Manzil:</strong> ${address}</p>
+                <p><strong>To'lov Usuli:</strong> ${payment}</p>
+                <p class="pt-2 border-t border-slate-800 text-amber-400 font-bold"><strong>Jami Summa:</strong> ${formatPrice(grandTotal)}</p>
+            `;
+
+            cart = [];
+            appliedPromo = null;
+            saveCart();
+
+            closeCheckoutModal();
+            document.getElementById('receipt-modal').classList.remove('hidden');
+        }
+
+        function closeReceiptModal() {
+            document.getElementById('receipt-modal').classList.add('hidden');
+            switchTab('home');
+        }
+
+        // Floating Live Chat Assistant Engine
+        function toggleLiveChat() {
+            document.getElementById('chat-window').classList.toggle('hidden');
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            const chatMessages = document.getElementById('chat-messages');
+            
+            // Append user message
+            chatMessages.innerHTML += `
+                <div class="bg-amber-500 text-navy-950 p-3 rounded-2xl rounded-tr-none max-w-[80%] ml-auto font-medium">
+                    ${msg}
+                </div>
+            `;
+            input.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Auto Bot Reply Simulation
+            setTimeout(() => {
+                let botReply = "Operatorlarimiz tez orada javob berishadi. Do'konimiz har kuni 08:00 dan 21:00 gacha ishlaydi.";
+                const lower = msg.toLowerCase();
+                
+                if (lower.includes('salom') || lower.includes('assalom')) {
+                    botReply = "Assalomu alaykum! Strong Trading do'koni xizmatida. Sizga qanday asbob yoki mahsulot kerak?";
+                } else if (lower.includes('dostavka') || lower.includes('yetkazib')) {
+                    botReply = "Toshkent shahri bo'ylab yetkazib berish vaqti 2 soatni tashkil qiladi.";
+                } else if (lower.includes('garantiya') || lower.includes('kafolat')) {
+                    botReply = "Barcha elektr jihozlarimizga 1 yildan 3 yilgacha rasmiy kafolat beramiz.";
+                }
+
+                chatMessages.innerHTML += `
+                    <div class="bg-slate-800/80 p-3 rounded-2xl rounded-tl-none max-w-[80%] text-slate-200">
+                        ${botReply}
+                    </div>
+                `;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 800);
+        }
+
+        // Contact Form Handler & FAQ Toggle
+        function handleContactSubmit(e) {
+            e.preventDefault();
+            showToast("Xabaringiz muvaffaqiyatli yuborildi!");
+            e.target.reset();
+        }
+
+        function toggleFaq(id) {
+            const ans = document.getElementById(`faq-ans-${id}`);
+            const icon = document.getElementById(`faq-icon-${id}`);
+            ans.classList.toggle('hidden');
+            icon.classList.toggle('rotate-180');
+        }
+
+        // Drawer Controllers
+        function openCartDrawer() {
+            renderCartDrawer();
+            document.getElementById('cart-drawer').classList.remove('hidden');
+        }
+        function closeCartDrawer() {
+            document.getElementById('cart-drawer').classList.add('hidden');
+        }
+        function openWishlistDrawer() {
+            renderWishlistDrawer();
+            document.getElementById('wishlist-drawer').classList.remove('hidden');
+        }
+        function closeWishlistDrawer() {
+            document.getElementById('wishlist-drawer').classList.add('hidden');
+        }
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+        function scrollToProducts() {
+            document.getElementById('catalog-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Utility Functions
+        function formatPrice(val) {
+            return new Intl.NumberFormat('uz-UZ').format(val) + " so'm";
+        }
+
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast-enter pointer-events-auto bg-navy-900 border border-amber-500/50 text-slate-100 px-4 py-3 rounded-xl shadow-xl flex items-center justify-between text-xs font-bold gap-3';
+            toast.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-circle-check text-amber-500 text-sm"></i>
+                    <span>${message}</span>
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.remove();
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
